@@ -6,6 +6,7 @@ import (
 	"log"
 	"movie-reservation-system/internal/database"
 	"movie-reservation-system/internal/handlers"
+	"movie-reservation-system/internal/middleware"
 	"net/http"
 	"os"
 	"os/signal"
@@ -39,14 +40,29 @@ func main() {
 		JWTSecret: []byte(jwtSecret),
 	}
 
+	movieHandler := handlers.MovieHandler{
+		DB: dbPool,
+	}
+
 	r := chi.NewRouter()
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Post("/users/signup", userHandler.SignupHandler)
 		r.Post("/users/login", userHandler.LoginHandler)
 
+		r.Get("/movies", movieHandler.GetMoviesHandler)
+		r.Get("/movies/{id}", movieHandler.GetMovieByIDHandler)
+
 		r.Group(func(r chi.Router) {
-			r.Use()
+			r.Use(middleware.AuthMiddleware([]byte(jwtSecret)))
+
+			r.Group(func(r chi.Router) {
+				r.Use(middleware.AdminOnlyMiddleware)
+
+				r.Post("/admin/movies", movieHandler.PostMovieHandler)
+				r.Put("/admin/movies/{id}", movieHandler.PutMovieHandler)
+				r.Delete("/admin/movies/{id}", movieHandler.DeleteMovieHandler)
+			})
 		})
 	})
 
