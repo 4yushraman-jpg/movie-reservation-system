@@ -65,3 +65,26 @@ func AuthMiddleware(jwtSecret []byte) func(http.Handler) http.Handler {
 		})
 	}
 }
+
+func AdminOnlyMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctxValue := r.Context().Value(UserContextKey)
+		if ctxValue == nil {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		claims, ok := ctxValue.(UserClaims)
+		if !ok {
+			http.Error(w, "Server error", http.StatusInternalServerError)
+			return
+		}
+
+		if claims.Role != "admin" {
+			http.Error(w, "Forbidden: Admin access required", http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
