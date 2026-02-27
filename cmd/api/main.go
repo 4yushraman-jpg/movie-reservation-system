@@ -60,6 +60,10 @@ func main() {
 		DB: dbPool,
 	}
 
+	bookingHandler := handlers.BookingHandler{
+		DB: dbPool,
+	}
+
 	r := chi.NewRouter()
 
 	r.Route("/api/v1", func(r chi.Router) {
@@ -78,6 +82,12 @@ func main() {
 
 		r.Group(func(r chi.Router) {
 			r.Use(middleware.AuthMiddleware([]byte(jwtSecret)))
+
+			r.Post("/bookings/lock", bookingHandler.LockSeatsHandler)
+			r.Post("/bookings/confirm", bookingHandler.ConfirmBookingHandler)
+			r.Get("/bookings", bookingHandler.GetBookingsHandler)
+			r.Get("/bookings/{id}", bookingHandler.GetBookingByIDHandler)
+			r.Post("/bookings/{id}/cancel", bookingHandler.CancelBookingHandler)
 
 			r.Group(func(r chi.Router) {
 				r.Use(middleware.AdminOnlyMiddleware)
