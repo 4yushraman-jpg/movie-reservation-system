@@ -68,7 +68,7 @@ movie-reservation-system/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/movie-reservation-system.git
+   git clone https://github.com/4yushraman-jpg/movie-reservation-system.git
    cd movie-reservation-system
    ```
 
@@ -191,6 +191,10 @@ The system uses the following main tables:
 3. User completes payment (confirm booking)
 4. Seats are marked as booked, or released if timer expires
 
-## License
+## Tech stack
 
-MIT License
+- **Router** — [Chi](https://github.com/go-chi/chi)
+- **Database** — [pgx](https://github.com/jackc/pgx/v5)
+- **JWT** — [golang-jwt/jwt](https://github.com/golang-jwt/jwt)
+- **Env** — [godotenv](https://github.com/joho/godotenv)
+- **Project URL** — [project URL](https://roadmap.sh/projects/movie-reservation-system)
