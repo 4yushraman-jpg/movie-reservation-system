@@ -44,6 +44,22 @@ func main() {
 		DB: dbPool,
 	}
 
+	theaterHandler := handlers.TheaterHandler{
+		DB: dbPool,
+	}
+
+	screenHandler := handlers.ScreenHandler{
+		DB: dbPool,
+	}
+
+	seatHandler := handlers.SeatHandler{
+		DB: dbPool,
+	}
+
+	showHandler := handlers.ShowHandler{
+		DB: dbPool,
+	}
+
 	r := chi.NewRouter()
 
 	r.Route("/api/v1", func(r chi.Router) {
@@ -52,6 +68,13 @@ func main() {
 
 		r.Get("/movies", movieHandler.GetMoviesHandler)
 		r.Get("/movies/{id}", movieHandler.GetMovieByIDHandler)
+
+		r.Get("/theaters", theaterHandler.GetTheatersHandler)
+
+		r.Get("/theaters/{theater_id}/screens", screenHandler.GetScreensHandler)
+
+		r.Get("/shows", showHandler.GetShowsHandler)
+		r.Get("/shows/{show_id}/seats", showHandler.GetShowSeatsHandler)
 
 		r.Group(func(r chi.Router) {
 			r.Use(middleware.AuthMiddleware([]byte(jwtSecret)))
@@ -62,6 +85,14 @@ func main() {
 				r.Post("/admin/movies", movieHandler.PostMovieHandler)
 				r.Put("/admin/movies/{id}", movieHandler.PutMovieHandler)
 				r.Delete("/admin/movies/{id}", movieHandler.DeleteMovieHandler)
+
+				r.Post("/admin/theaters", theaterHandler.PostTheaterHandler)
+
+				r.Post("/admin/theaters/{theater_id}/screens", screenHandler.PostScreenHandler)
+
+				r.Post("/admin/screens/{screen_id}/seats", seatHandler.GenerateSeatsHandler)
+
+				r.Post("/admin/shows", showHandler.PostShowHandler)
 			})
 		})
 	})
